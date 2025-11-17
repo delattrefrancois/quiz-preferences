@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultats - Quiz Thématiques</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-refresh {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-refresh:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-clear {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-form {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-form:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .stats-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .results-section {
+            margin-bottom: 20px;
+        }
+
+        .theme-result {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+
+        .theme-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .theme-letter {
+            color: #667eea;
+            margin-right: 10px;
+        }
+
+        .votes-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .vote-item {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+
+        .vote-name {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .vote-value {
+            color: #333;
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .total-label {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .total-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-data h2 {
+            margin-bottom: 20px;
+            color: #999;
+        }
+
+        .top-themes {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .top-themes h2 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .top-theme-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4caf50;
+            width: 40px;
+        }
+
+        .top-name {
+            flex: 1;
+            font-size: 1.1em;
+        }
+
+        .top-score {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Résultats des Notations</h1>
+            <p>Synthèse des votes pour chaque thématique</p>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-refresh" onclick="loadResults()">🔄 Rafraîchir</button>
+            <button class="btn btn-clear" onclick="clearData()">🗑️ Effacer toutes les données</button>
+            <button class="btn btn-form" onclick="window.location.href='index.html'">📝 Retour au formulaire</button>
+        </div>
+
+        <div class="stats-summary" id="statsSummary">
+            <!-- Stats générées dynamiquement -->
+        </div>
+
+        <div class="top-themes" id="topThemes" style="display: none;">
+            <h2>🏆 Top 10 des Thématiques</h2>
+            <div id="topThemesList"></div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <!-- Résultats générés dynamiquement -->
+        </div>
+
+        <div class="no-data" id="noData" style="display: none;">
+            <h2>Aucune donnée disponible</h2>
+            <p>Commencez par remplir le formulaire !</p>
+            <button class="btn btn-form" onclick="window.location.href='index.html'" style="margin-top: 20px;">📝 Aller au formulaire</button>
+        </div>
+    </div>
+
+    <script>
+        const themeNames = {
+            'A': 'Cinéma français',
+            'B': 'Cinéma avant 1980',
+            'C': 'Cinéma après 1980',
+            'D': 'Séries',
+            'E': 'Musique pop/folk/rock/metal/punk',
+            'F': 'Musique soul/gospel/disco/blues/rnb',
+            'G': 'Musique Dance/electro',
+            'H': 'Musique jazz/world/fusion',
+            'I': 'Musique Chanson française',
+            'J': 'Sports/jeux',
+            'K': 'Nature/animaux/Écologie',
+            'L': 'Histoire France',
+            'M': 'Histoire mondiale',
+            'N': 'Géographie France',
+            'O': 'Géographie mondiale',
+            'P': 'Sciences/Technologies',
+            'Q': 'Littérature/Théâtre/Spectacles',
+            'R': 'Santé/Médecine/Bien-être',
+            'S': 'Actualités générales',
+            'T': 'Économie/sociologie/politique',
+            'U': 'Médias/People/Marques/Presse',
+            'V': 'Charente-Maritime/Local',
+            'W': 'Vie quotidienne (Nourriture, Logement, Bricolage, Transports...)'
+        };
+
+        function loadResults() {
+            const data = JSON.parse(localStorage.getItem('quizNotations') || '[]');
+            
+            if (data.length === 0) {
+                document.getElementById('noData').style.display = 'block';
+                document.getElementById('resultsSection').innerHTML = '';
+                document.getElementById('statsSummary').innerHTML = '';
+                document.getElementById('topThemes').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('noData').style.display = 'none';
+            
+            // Calculer les statistiques
+            displayStats(data);
+            
+            // Agréger les votes par thématique
+            const aggregated = {};
+            const themeTotals = {};
+            
+            Object.keys(themeNames).forEach(letter => {
+                aggregated[letter] = [];
+                themeTotals[letter] = 0;
+            });
+
+            data.forEach(entry => {
+                Object.keys(entry.themes).forEach(themeLetter => {
+                    const value = entry.themes[themeLetter];
+                    aggregated[themeLetter].push({
+                        name: entry.prenom,
+                        value: value
+                    });
+                    themeTotals[themeLetter] += value;
+                });
+            });
+
+            // Afficher le top 10
+            displayTop10(themeTotals);
+
+            // Afficher les résultats
+            displayResults(aggregated, themeTotals);
+        }
+
+        function displayStats(data) {
+            const totalVotes = data.length;
+            const totalThemes = Object.keys(themeNames).length;
+            
+            let totalPoints = 0;
+            data.forEach(entry => {
+                Object.values(entry.themes).forEach(value => {
+                    totalPoints += value;
+                });
+            });
+
+            const averagePerTheme = totalVotes > 0 ? (totalPoints / totalThemes).toFixed(1) : 0;
+
+            document.getElementById('statsSummary').innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">${totalVotes}</div>
+                    <div class="stat-label">Participants</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${totalThemes}</div>
+                    <div class="stat-label">Thématiques</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${totalPoints}</div>
+                    <div class="stat-label">Points totaux</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${averagePerTheme}</div>
+                    <div class="stat-label">Moyenne par thème</div>
+                </div>
+            `;
+        }
+
+        function displayTop10(themeTotals) {
+            const sorted = Object.entries(themeTotals)
+                .map(([letter, total]) => ({
+                    letter: letter,
+                    name: themeNames[letter],
+                    total: total
+                }))
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 10);
+
+            const topThemesList = document.getElementById('topThemesList');
+            topThemesList.innerHTML = sorted.map((item, index) => `
+                <div class="top-theme-item">
+                    <span class="top-rank">#${index + 1}</span>
+                    <span class="top-name">${item.letter}. ${item.name}</span>
+                    <span class="top-score">${item.total} pts</span>
+                </div>
+            `).join('');
+
+            document.getElementById('topThemes').style.display = 'block';
+        }
+
+        function displayResults(aggregated, themeTotals) {
+            const resultsSection = document.getElementById('resultsSection');
+            
+            let html = '';
+            
+            Object.keys(themeNames).forEach(letter => {
+                const votes = aggregated[letter];
+                const total = themeTotals[letter];
+                
+                if (votes.length === 0) return;
+
+                html += `
+                    <div class="theme-result">
+                        <div class="theme-name">
+                            <span class="theme-letter">${letter}.</span> ${themeNames[letter]}
+                        </div>
+                        <div class="votes-list">
+                            ${votes.map(vote => `
+                                <div class="vote-item">
+                                    <span class="vote-name">${vote.name}</span>: 
+                                    <span class="vote-value">${vote.value}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="total-section">
+                            <span class="total-label">Total temporaire :</span>
+                            <span class="total-value">${total}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultsSection.innerHTML = html;
+        }
+
+        function clearData() {
+            if (confirm('⚠️ Êtes-vous sûr de vouloir effacer toutes les données ? Cette action est irréversible.')) {
+                localStorage.removeItem('quizNotations');
+                loadResults();
+                alert('✅ Toutes les données ont été effacées.');
+            }
+        }
+
+        // Charger les résultats au démarrage
+        loadResults();
+
+        // Rafraîchir automatiquement toutes les 10 secondes
+        setInterval(loadResults, 10000);
+    </script>
+</body>
+</html>
