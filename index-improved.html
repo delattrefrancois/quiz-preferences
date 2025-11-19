@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Notation - Quiz Thématiques</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .success-message {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+            animation: slideIn 0.5s ease-out;
+        }
+        .success-message.show { display: block; }
+        .success-message .success-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            animation: bounce 1s ease-in-out;
+        }
+        .success-message .success-title {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .success-message .success-text {
+            font-size: 1.3em;
+            line-height: 1.6;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { color: #667eea; font-size: 2.5em; margin-bottom: 10px; }
+        .header p { color: #666; font-size: 1.1em; }
+        .name-section { margin-bottom: 40px; padding: 30px; background: #f8f9fa; border-radius: 15px; }
+        .name-section label { display: block; font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 10px; }
+        .name-section input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+        .name-section input:focus { outline: none; border-color: #667eea; }
+        .themes-section { margin-bottom: 30px; }
+        .themes-section h2 { color: #667eea; font-size: 1.8em; margin-bottom: 20px; text-align: center; }
+        .theme-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        .theme-item:hover { background: #e8e8ff; transform: translateX(5px); }
+        .theme-letter { font-size: 1.5em; font-weight: bold; color: #667eea; width: 40px; flex-shrink: 0; }
+        .theme-label { flex: 1; font-size: 1.1em; color: #333; padding-left: 15px; }
+        .theme-input {
+            width: 80px;
+            padding: 10px;
+            font-size: 1.1em;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+        .theme-input:focus { outline: none; border-color: #667eea; }
+        .theme-input.error { border-color: #dc3545; background: #ffe6e6; }
+        .instructions {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #ffc107;
+        }
+        .instructions p { color: #856404; margin-bottom: 10px; }
+        .submit-section { text-align: center; margin-top: 40px; }
+        .btn-submit {
+            padding: 15px 50px;
+            font-size: 1.3em;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .btn-submit:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; }
+        .error-message { color: #dc3545; text-align: center; margin-top: 20px; font-size: 1.1em; display: none; }
+        .error-message.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">✅</div>
+            <div class="success-title">Merci !</div>
+            <div class="success-text">Vos notes ont été enregistrées avec succès !<br>Merci pour votre participation.</div>
+        </div>
+        <div class="header">
+            <h1>📋 Formulaire de Notation</h1>
+            <p>Attribuez une note de 1 à 23 pour chaque thématique</p>
+        </div>
+        <div class="instructions">
+            <p><strong>📝 Instructions :</strong></p>
+            <p>• Entrez votre prénom</p>
+            <p>• Notez les thématiques de celle que vous préférez (23) à celle que vous aimez le moins (1)</p>
+        </div>
+        <form id="notationForm">
+            <div class="name-section">
+                <label for="prenom">Votre prénom :</label>
+                <input type="text" id="prenom" name="prenom" required placeholder="Entrez votre prénom...">
+            </div>
+            <div class="themes-section">
+                <h2>Thématiques à noter</h2>
+                <div class="theme-item"><span class="theme-letter">A.</span><span class="theme-label">Cinéma français</span><input type="number" class="theme-input" name="theme_a" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">B.</span><span class="theme-label">Cinéma avant 1980</span><input type="number" class="theme-input" name="theme_b" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">C.</span><span class="theme-label">Cinéma après 1980</span><input type="number" class="theme-input" name="theme_c" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">D.</span><span class="theme-label">Séries</span><input type="number" class="theme-input" name="theme_d" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">E.</span><span class="theme-label">Musique pop/folk/rock/metal/punk</span><input type="number" class="theme-input" name="theme_e" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">F.</span><span class="theme-label">Musique soul/gospel/disco/blues/rnb</span><input type="number" class="theme-input" name="theme_f" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">G.</span><span class="theme-label">Musique Dance/electro</span><input type="number" class="theme-input" name="theme_g" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">H.</span><span class="theme-label">Musique jazz/world/fusion</span><input type="number" class="theme-input" name="theme_h" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">I.</span><span class="theme-label">Musique Chanson française</span><input type="number" class="theme-input" name="theme_i" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">J.</span><span class="theme-label">Sports/jeux</span><input type="number" class="theme-input" name="theme_j" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">K.</span><span class="theme-label">Nature/animaux/Écologie</span><input type="number" class="theme-input" name="theme_k" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">L.</span><span class="theme-label">Histoire France</span><input type="number" class="theme-input" name="theme_l" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">M.</span><span class="theme-label">Histoire mondiale</span><input type="number" class="theme-input" name="theme_m" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">N.</span><span class="theme-label">Géographie France</span><input type="number" class="theme-input" name="theme_n" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">O.</span><span class="theme-label">Géographie mondiale</span><input type="number" class="theme-input" name="theme_o" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">P.</span><span class="theme-label">Sciences/Technologies</span><input type="number" class="theme-input" name="theme_p" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">Q.</span><span class="theme-label">Art et littérature</span><input type="number" class="theme-input" name="theme_q" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">R.</span><span class="theme-label">Santé/Médecine/Bien-être</span><input type="number" class="theme-input" name="theme_r" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">S.</span><span class="theme-label">Actualités générales</span><input type="number" class="theme-input" name="theme_s" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">T.</span><span class="theme-label">Économie/sociologie/politique</span><input type="number" class="theme-input" name="theme_t" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">U.</span><span class="theme-label">Médias/People/Marques/Presse</span><input type="number" class="theme-input" name="theme_u" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">V.</span><span class="theme-label">Charente-Maritime/Local</span><input type="number" class="theme-input" name="theme_v" min="1" max="23"></div>
+                <div class="theme-item"><span class="theme-letter">W.</span><span class="theme-label">Vie quotidienne (Nourriture, Logement, Bricolage, Transports...)</span><input type="number" class="theme-input" name="theme_w" min="1" max="23"></div>
+            </div>
+            <div class="submit-section">
+                <button type="submit" class="btn-submit" id="btnSubmit">📤 Soumettre mes notes</button>
+            </div>
+            <div class="error-message" id="errorMessage">⚠️ Les notes doivent être entre 1 et 23</div>
+        </form>
+    </div>
+    <script>
+        const form = document.getElementById('notationForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const prenomInput = document.getElementById('prenom');
+        const themeInputs = document.querySelectorAll('.theme-input');
+        const btnSubmit = document.getElementById('btnSubmit');
+        let isSubmitting = false;
+
+        themeInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (value < 1 || value > 23 || isNaN(value)) {
+                    this.classList.add('error');
+                } else {
+                    this.classList.remove('error');
+                }
+            });
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (isSubmitting) return;
+            isSubmitting = true;
+            btnSubmit.disabled = true;
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+
+            const prenom = prenomInput.value.trim();
+            if (prenom === '') {
+                errorMessage.textContent = '⚠️ Veuillez entrer votre prénom';
+                errorMessage.classList.add('show');
+                prenomInput.focus();
+                isSubmitting = false;
+                btnSubmit.disabled = false;
+                return;
+            }
+
+            let isValid = true, hasAtLeastOne = false;
+            themeInputs.forEach(input => {
+                const value = parseInt(input.value);
+                if (input.value.trim() !== '') {
+                    hasAtLeastOne = true;
+                    if (isNaN(value) || value < 1 || value > 23) {
+                        isValid = false;
+                        input.classList.add('error');
+                    }
+                }
+            });
+
+            if (!hasAtLeastOne) {
+                errorMessage.textContent = '⚠️ Veuillez noter au moins une thématique';
+                errorMessage.classList.add('show');
+                isSubmitting = false;
+                btnSubmit.disabled = false;
+                return;
+            }
+
+            if (!isValid) {
+                errorMessage.textContent = '⚠️ Les notes doivent être entre 1 et 23';
+                errorMessage.classList.add('show');
+                isSubmitting = false;
+                btnSubmit.disabled = false;
+                return;
+            }
+
+            const formData = {
+                prenom: prenom,
+                timestamp: new Date().toISOString(),
+                themes: {}
+            };
+
+            themeInputs.forEach(input => {
+                const themeName = input.name.replace('theme_', '').toUpperCase();
+                const value = parseInt(input.value);
+                if (!isNaN(value) && input.value.trim() !== '') {
+                    formData.themes[themeName] = value;
+                }
+            });
+
+            try {
+                const existingData = localStorage.getItem('quizNotations');
+                let allData = existingData ? JSON.parse(existingData) : [];
+                if (!Array.isArray(allData)) allData = [];
+                allData.push(formData);
+                localStorage.setItem('quizNotations', JSON.stringify(allData));
+                const verification = localStorage.getItem('quizNotations');
+                if (!verification) throw new Error('Sauvegarde échouée');
+                
+                console.log('✅ Données sauvegardées:', formData);
+                console.log('📊 Total des entrées:', allData.length);
+                
+                form.reset();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setTimeout(() => successMessage.classList.add('show'), 300);
+                setTimeout(() => {
+                    successMessage.classList.remove('show');
+                    isSubmitting = false;
+                    btnSubmit.disabled = false;
+                }, 5300);
+                
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                errorMessage.textContent = '⚠️ Erreur lors de la sauvegarde. Veuillez réessayer.';
+                errorMessage.classList.add('show');
+                isSubmitting = false;
+                btnSubmit.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
